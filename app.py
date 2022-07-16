@@ -27,12 +27,11 @@ def lambda_handler(event, context):
 
     # get service account key .json file from S3 and give local path
     s3 = boto3.client('s3')
-    BUCKET_NAME = s3_bucket
-    KEY = g_service_acc_key
-    LOCAL_FILENAME = '/tmp/{}'.format(os.path.basename(KEY))
+    LOCAL_FILENAME = '/tmp/{}'.format(os.path.basename(g_service_acc_key))
 
     try:
-        s3.download_file(Bucket=BUCKET_NAME, Key=KEY, Filename=LOCAL_FILENAME)
+        s3.download_file(Bucket=s3_bucket, Key=g_service_acc_key,
+                         Filename=LOCAL_FILENAME)
         with open(LOCAL_FILENAME, 'r') as handle:
             parsed = json.load(handle)
             print(json.dumps(parsed, indent=4, sort_keys=True))
@@ -55,4 +54,3 @@ def lambda_handler(event, context):
     gc = pygsheets.authorize(service_file=LOCAL_FILENAME)
     wks = gc.open(gsheet_title).sheet1
     wks.set_dataframe(df, (1, 1))
-
